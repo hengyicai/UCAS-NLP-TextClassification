@@ -42,6 +42,15 @@ class InputFile(object):
     def get_content(self):
         return self.content
 
+    def get_path(self):
+        return self.path
+
+    def get_name(self):
+        return self.path.split('/')[-1]
+
+    def get_class(self):
+        return self.clazz
+
 
 if __name__ == '__main__':
     input_corpus = InputCorpus('../corpus', 'gb18030')

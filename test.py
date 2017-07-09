@@ -3,12 +3,7 @@
 
 
 def feature_test():
-    from datasource.input_corpus import InputCorpus
-    from feature.unigram_tfidf import UnigramTfidf
-
-    input_corpus = InputCorpus('./corpus', encoding='gb18030')
-    unigram_tfidf = UnigramTfidf(input_corpus)
-    unigram_tfidf.get_tfidf_mat()
+    pass
 
 
 def unit_test():
