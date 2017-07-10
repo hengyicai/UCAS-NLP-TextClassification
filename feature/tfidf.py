@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 class Tfidf(object):
+
     STOP_WORDS = set((
         "the", "of", "is", "and", "to", "in", "that", "we", "for", "an", "are",
         "by", "be", "as", "on", "with", "can", "if", "from", "which", "you", "it",
@@ -13,8 +14,16 @@ class Tfidf(object):
         self.stop_words = self.STOP_WORDS.copy()
         self.vocab = list()
         self.weight = [[]]
+        self.tf = [[]]
+        self.documents = []
 
     def get_tfidf_mat(self):
+        pass
+
+    def get_tf_mat(self):
+        pass
+
+    def __get_docs(self):
         pass
 
     def set_stopwords(self, stopwords_path):
