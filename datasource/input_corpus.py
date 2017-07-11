@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "HayesTsai"
 
 import os
 
@@ -11,23 +12,39 @@ class InputCorpus(object):
             self.encoding = encoding
         else:
             raise Exception(str(m_dir) + " does not exist!")
+        self.input_files = []
+        self.filenames = []
+        self.targets = []
 
     def get_files(self):
-        ret_files = []
-        for root, _, files in os.walk(self.input_path, topdown=False):
-            for name in files:
-                if '-' in name:
-                    clazz = name.split('-')[0]
-                    file_path = os.path.abspath(os.path.join(root, name))
-                    ret_files.append(
-                        InputFile(
-                            file_path,
-                            clazz,
-                            from_encoding=self.encoding,
-                            to_encoding='utf-8'
+        if not self.input_files:
+            ret_files = []
+            for root, _, files in os.walk(self.input_path, topdown=False):
+                for name in files:
+                    if '-' in name:
+                        clazz = name.split('-')[0]
+                        file_path = os.path.abspath(os.path.join(root, name))
+                        ret_files.append(
+                            InputFile(
+                                file_path,
+                                clazz,
+                                from_encoding=self.encoding,
+                                to_encoding='utf-8'
+                            )
                         )
-                    )
-        return ret_files
+            self.input_files = ret_files
+        return self.input_files
+
+    def get_filenames_and_targets(self):
+        if not self.input_files:
+            self.get_files()
+        if self.filenames == [] or self.targets == []:
+            self.filenames = []
+            self.targets = []
+            for input_file in self.input_files:
+                self.filenames.append(input_file.get_name())
+                self.targets.append(input_file.get_class())
+        return self.filenames, self.targets
 
 
 class InputFile(object):

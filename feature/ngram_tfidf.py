@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 import tfidf
 
 
-class UnigramTfidf(tfidf.Tfidf):
+class NgramTfidf(tfidf.Tfidf):
     def get_tfidf_mat(self):
         if not self.documents:
             self.__get_docs()
@@ -30,6 +30,7 @@ class UnigramTfidf(tfidf.Tfidf):
                 print('-->')
                 print(str(self.weight[i][j]))
         '''
+        return self.weight
 
     def get_tf_mat(self):
         if not self.documents:
@@ -38,17 +39,18 @@ class UnigramTfidf(tfidf.Tfidf):
         vectorizer = CountVectorizer()
         self.tf = vectorizer.fit_transform(self.documents).toarray()
         self.vocab = vectorizer.get_feature_names()
+        return self.tf
 
     def __get_docs(self):
         documents = list()
 
         for input_file in self.input_files:
             content_text = input_file.get_content()
-            words = self.__cut(content_text)
+            words = self.__cut1(content_text)
             documents.append(words)
         self.documents = documents
 
-    def __cut(self, text):
+    def __cut1(self, text):
         words = pseg.cut(text)
         tags = []
         for item in words:
@@ -58,6 +60,23 @@ class UnigramTfidf(tfidf.Tfidf):
                 continue
             tags.append(item.word)
         return " ".join(tags)
+
+    def __cut2(self, text):
+        words = pseg.cut(text)
+        tags = []
+        for item in words:
+            if item.word in self.stop_words:
+                continue
+            if item.word.isdigit():
+                continue
+            tags.append(item.word)
+        bi_grams = []
+        for i in range(len(tags) - 1):
+            bi_grams.append(tags[i] + tags[i + 1])
+        return " ".join(bi_grams)
+
+    def __cut12(self, text):
+        return self.__cut1(text) + " " + self.__cut2(text)
 
     def save_tfidf(self, save_to_path, top_k=20):
         if self.weight == [[]]:
