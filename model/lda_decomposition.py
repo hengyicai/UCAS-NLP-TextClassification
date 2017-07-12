@@ -13,8 +13,8 @@ def display_topics(model, feature_names, no_top_words):
 
 
 class LDADec(object):
-    def __init__(self, tfidf_obj, num_topics=20, max_iter=5):
-        self.tf = tfidf_obj.get_tf_mat()
+    def __init__(self, tf_mat, num_topics=20, max_iter=5):
+        self.tf = tf_mat
         self.num_topics = num_topics
         self.max_iter = max_iter
         self.doc_topic_mat = [[]]
@@ -26,8 +26,7 @@ class LDADec(object):
                 max_iter=self.max_iter,
                 learning_method='online',
                 learning_offset=50.,
-                random_state=0,
-                n_jobs=-1
+                random_state=0
             )
             lda.fit(self.tf)
             # doc_topic_distr : shape=(n_samples, n_topics),Document topic distribution for tf.

@@ -13,7 +13,7 @@ def lda_model_test():
     unigram_tfidf = NgramTfidf(input_corpus)
     unigram_tfidf.set_stopwords('./data/stop_words_zh.utf8.txt')
     from model.lda_decomposition import LDADec
-    lda = LDADec(unigram_tfidf)
+    lda = LDADec(unigram_tfidf.get_tf_mat())
     lda.save_doc_topic_mat('./output/test.lda.txt')
 
 
@@ -24,16 +24,32 @@ def svm_model_test():
     unigram_tfidf = NgramTfidf(input_corpus)
     unigram_tfidf.set_stopwords('./data/stop_words_zh.utf8.txt')
     from model.lda_decomposition import LDADec
-    lda = LDADec(unigram_tfidf)
+    lda = LDADec(unigram_tfidf.get_tf_mat())
     from model.svm_classifier import SVMClassifier
     svm = SVMClassifier(lda.get_doc_topic_mat(), input_corpus.get_filenames_and_targets()[1])
     svm.test()
 
 
+def lda_model_local_features_test():
+    tf_mat = []
+    with open('./output/tf/tf.features.txt') as feature_f:
+        feature_f.readline()
+        line = feature_f.readline()
+        while line:
+            line = line.strip()
+            tf_mat.append([int(item) for item in line.split(',')])
+            line = feature_f.readline()
+    from model.lda_decomposition import LDADec
+    lda = LDADec(tf_mat, num_topics=300)
+    lda.save_doc_topic_mat('./output/lda/doc_topics_300_from_top_5000_features.txt')
+
+
+
 def test():
     feature_test()
     # lda_model_test()
-    svm_model_test()
+    # svm_model_test()
+    lda_model_local_features_test()
 
 
 if __name__ == '__main__':
