@@ -39,5 +39,5 @@ class LDADec(object):
             self.get_doc_topic_mat()
         with open(path_to_save, 'a') as dest_f:
             for doc in self.doc_topic_mat:
-                dest_f.write(",".join([str(float(item)) for item in doc]))
+                dest_f.write(",".join(['%f' % item for item in doc]))
                 dest_f.write('\n')
