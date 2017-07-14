@@ -1,56 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-def feature_test():
-    pass
+from options.test_options import TestOptions
 
 
-def lda_model_test():
-    from datasource.input_corpus import InputCorpus
-    input_corpus = InputCorpus('./corpus_test', encoding='gb18030')
-    from feature.ngram_tfidf import NgramTfidf
-    unigram_tfidf = NgramTfidf(input_corpus)
-    unigram_tfidf.set_stopwords('./data/stop_words_zh.utf8.txt')
-    from model.lda_decomposition import LDADec
-    lda = LDADec(unigram_tfidf.get_tf_mat())
-    lda.save_doc_topic_mat('./output/test.lda.txt')
+def check_args(opt):
+    model_path = opt.model_path
+    test_dir = opt.test_dir
+    suffix_accepted = opt.suffix_accepted
+    import os
+    assert os.path.exists(model_path), model_path + ' does not exist!'
+    assert os.path.isdir(test_dir), test_dir + ' does not exist!'
+    assert isinstance(type(suffix_accepted.split(',')), list), suffix_accepted + 'should be comma splited!'
 
 
-def svm_model_test():
-    from datasource.input_corpus import InputCorpus
-    input_corpus = InputCorpus('./corpus_test', encoding='gb18030')
-    from feature.ngram_tfidf import NgramTfidf
-    unigram_tfidf = NgramTfidf(input_corpus)
-    unigram_tfidf.set_stopwords('./data/stop_words_zh.utf8.txt')
-    from model.lda_decomposition import LDADec
-    lda = LDADec(unigram_tfidf.get_tf_mat())
-    from model.svm_classifier import SVMClassifier
-    svm = SVMClassifier(lda.get_doc_topic_mat(), input_corpus.get_filenames_and_targets()[1])
-    svm.test()
+def test(opt):
+    check_args(opt)
+    model_path = opt.model_path
+    test_dir = opt.test_dir
+    suffix_accepted = opt.suffix_accepted
 
-
-def lda_model_local_features_test():
-    tf_mat = []
-    with open('./output/tf/tf.features.txt') as feature_f:
-        feature_f.readline()
-        line = feature_f.readline()
-        while line:
-            line = line.strip()
-            tf_mat.append([int(item) for item in line.split(',')])
-            line = feature_f.readline()
-    from model.lda_decomposition import LDADec
-    lda = LDADec(tf_mat, num_topics=300)
-    lda.save_doc_topic_mat('./output/lda/doc_topics_300_from_top_5000_features.txt')
-
-
-
-def test():
-    feature_test()
-    # lda_model_test()
-    # svm_model_test()
-    lda_model_local_features_test()
 
 
 if __name__ == '__main__':
-    test()
+    opt = TestOptions().parse_arguments()
+    test(opt)
