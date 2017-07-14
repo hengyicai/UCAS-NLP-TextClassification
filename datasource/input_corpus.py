@@ -22,7 +22,7 @@ class InputCorpus(object):
             for root, _, files in os.walk(self.input_path, topdown=False):
                 for name in files:
                     if '-' in name:
-                        clazz = name.split('-')[0]
+                        clazz = name.split('-')[0][1:]
                         file_path = os.path.abspath(os.path.join(root, name))
                         ret_files.append(
                             InputFile(

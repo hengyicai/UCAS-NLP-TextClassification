@@ -20,6 +20,15 @@ def test(opt):
     test_dir = opt.test_dir
     suffix_accepted = opt.suffix_accepted
 
+    # Read documents under test_dir into the list of InputFile
+
+    # Generate the feature matrix of InputFile
+
+    # Load the pretrained model
+
+    # Do predict
+
+    # Show the result
 
 
 if __name__ == '__main__':

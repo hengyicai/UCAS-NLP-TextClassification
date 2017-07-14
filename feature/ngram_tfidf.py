@@ -6,40 +6,64 @@ import jieba.posseg as pseg
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
-import tfidf
 
+class Tfidf(object):
+    STOP_WORDS = set((
+        "the", "of", "is", "and", "to", "in", "that", "we", "for", "an", "are",
+        "by", "be", "as", "on", "with", "can", "if", "from", "which", "you", "it",
+        "this", "then", "at", "have", "all", "not", "one", "has", "or", "that"
+    ))
 
-class NgramTfidf(tfidf.Tfidf):
+    def __init__(self, input_corpus):
+        self.input_files = input_corpus.get_files()
+        self.stop_words = self.STOP_WORDS.copy()
+        self.vocab = list()
+        self.weight = [[]]
+        self.tf = [[]]
+        self.documents = []
+
     def get_tfidf_mat(self):
+        pass
+
+    def get_tf_mat(self):
+        pass
+
+    def __get_docs(self):
+        pass
+
+    def set_stopwords(self, stopwords_path):
+        from os import path
+        from os import getcwd
+        _get_abs_path = lambda xpath: path.normpath(path.join(getcwd(), xpath))
+        abs_path = _get_abs_path(stopwords_path)
+        if not path.isfile(abs_path):
+            raise Exception("tfidf: file does not exist: " + abs_path)
+        content = open(abs_path, 'rb').read().decode('utf-8')
+        for line in content.splitlines():
+            self.stop_words.add(line)
+
+
+class NgramTfidf(Tfidf):
+    def get_tfidf_mat(self, top_k=-1):
         if not self.documents:
             self.__get_docs()
         if self.tf == [[]]:
             self.get_tf_mat()
 
-        transformer = TfidfTransformer()  # 该类会统计每个词语的tf-idf权值
-        tfidf = transformer.fit_transform(
-            self.tf)  # 第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
+        transformer = TfidfTransformer()
+        tfidf = transformer.fit_transform(self.tf)
 
-        self.weight = tfidf.toarray()  # 将tf-idf矩阵抽取出来，元素a[i][j]表示j词在i类文本中的tf-idf权重
+        self.weight = tfidf.toarray()
+        return self.__top_k_tfidf(top_k)[0] if top_k > 0 else self.weight
 
-        '''
-        for i in range(len(self.weight)):  # 打印每类文本的tf-idf词语权重，第一个for遍历所有文本，第二个for遍历某一类文本下的词语权重
-            print(u"-------这里输出第", i, u"类文本的词语tf-idf权重------")
-            for j in range(len(self.vocab)):
-                print(self.vocab[j])
-                print('-->')
-                print(str(self.weight[i][j]))
-        '''
-        return self.weight
-
-    def get_tf_mat(self):
+    def get_tf_mat(self, top_k=-1):
         if not self.documents:
             self.__get_docs()
 
         vectorizer = CountVectorizer()
         self.tf = vectorizer.fit_transform(self.documents).toarray()
         self.vocab = vectorizer.get_feature_names()
-        return self.tf
+        return self.__top_k_tf(top_k)[0] if top_k > 0 else self.tf
 
     def __get_docs(self):
         documents = list()
@@ -78,27 +102,37 @@ class NgramTfidf(tfidf.Tfidf):
     def __cut12(self, text):
         return self.__cut1(text) + " " + self.__cut2(text)
 
+    def __top_k_tfidf(self, top_k):
+        return self.__top_k_features(self.weight, self.vocab, top_k)
+
+    def __top_k_tf(self, top_k):
+        return self.__top_k_features(self.tf, self.vocab, top_k)
+
+    def __top_k_features(self, mat, vec, top_k):
+        # select top_k features
+        feature_sum_vec = sum(mat)
+
+        import numpy as np
+        sorted_index = list(np.argsort(feature_sum_vec))
+        sorted_index.reverse()
+
+        top_k = len(sorted_index) if len(sorted_index) <= top_k else top_k
+        new_mat = np.zeros((len(mat), top_k))
+        new_vocab = []
+
+        for i in range(top_k):
+            new_vocab.append(vec[sorted_index[i]])
+
+        for index_of_doc in range(len(self.tf)):
+            for index_of_feature in range(top_k):
+                new_mat[index_of_doc][index_of_feature] = mat[index_of_doc][sorted_index[index_of_feature]]
+        return new_mat, new_vocab
+
     def save_tfidf(self, save_to_path, top_k=20):
         if self.weight == [[]]:
             self.get_tfidf_mat()
 
-        # select top_k features
-        feature_tfidf_sum_vec = sum(self.weight)
-
-        import numpy as np
-        sorted_index = list(np.argsort(feature_tfidf_sum_vec))
-        sorted_index.reverse()
-
-        top_k = len(sorted_index) if len(sorted_index) <= top_k else top_k
-        new_weight = np.zeros((len(self.weight), top_k))
-        new_vocab = []
-
-        for i in range(top_k):
-            new_vocab.append(self.vocab[sorted_index[i]])
-
-        for index_of_doc in range(len(self.weight)):
-            for index_of_feature in range(top_k):
-                new_weight[index_of_doc][index_of_feature] = self.weight[index_of_doc][sorted_index[index_of_feature]]
+        new_weight, new_vocab = self.__top_k_tfidf(top_k)
 
         with open(save_to_path, 'w') as dest_f:
             dest_f.write("file_names,")
@@ -118,24 +152,7 @@ class NgramTfidf(tfidf.Tfidf):
         if self.tf == [[]]:
             self.get_tf_mat()
 
-        # select top_k features
-        feature_tf_sum_vec = sum(self.tf)
-
-        import numpy as np
-        sorted_index = list(np.argsort(feature_tf_sum_vec))
-        sorted_index.reverse()
-
-        top_k = len(sorted_index) if len(sorted_index) <= top_k else top_k
-        new_tf = np.zeros((len(self.tf), top_k))
-        new_vocab = []
-
-        for i in range(top_k):
-            new_vocab.append(self.vocab[sorted_index[i]])
-
-        for index_of_doc in range(len(self.tf)):
-            for index_of_feature in range(top_k):
-                new_tf[index_of_doc][index_of_feature] = self.tf[index_of_doc][sorted_index[index_of_feature]]
-
+        new_tf, new_vocab = self.__top_k_tf(top_k)
         with open(save_to_path, 'w') as dest_f:
             dest_f.write("file_names,")
             dest_f.write(",".join(new_vocab).encode('utf-8'))
