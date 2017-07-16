@@ -24,7 +24,7 @@ def svm_model_test():
     unigram_tfidf = NgramTfidf(input_corpus)
     unigram_tfidf.set_stopwords('./resource/stop_words_zh.utf8.txt')
     from model.decomposition import LDADec
-    lda = LDADec(unigram_tfidf.get_tf_mat()[0])
+    lda = LDADec(unigram_tfidf.get_tf_mat(top_k=5000)[0], num_topics=500)
     from model.classifier import SVMClassifier
     svm = SVMClassifier(lda.get_doc_topic_mat(), input_corpus.get_filenames_and_targets()[1])
     svm.train()
