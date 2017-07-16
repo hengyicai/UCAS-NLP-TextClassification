@@ -101,5 +101,5 @@ class Scorer(object):
         else:
             from sklearn.cross_validation import cross_val_score as cvs
 
-        scores = cvs(self.model, self.X, self.targets)
+        scores = cvs(self.model, self.X, self.targets, cv=5)
         print("mean of scores is: " + str(scores.mean()))
