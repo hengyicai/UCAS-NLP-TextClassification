@@ -14,7 +14,7 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument(
             '--tfidf_top_k',
             type=int,
-            default=300,
+            default=5000,
             help='features with tfidf value within top_k will be selected'
         )
         self.parser.add_argument(
@@ -39,6 +39,6 @@ class TrainOptions(BaseOptions):
             '--mi_threshold',
             type=float,
             default=0.06,
-            help=''
+            help='threshold value used by mutual information feature selection'
         )
         self.isTrain = True

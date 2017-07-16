@@ -13,12 +13,14 @@ class BaseOptions():
         self.parser.add_argument(
             '--name',
             type=str,
-            default='./ucas_nlp_textclassification'
+            default='./ucas_nlp_textclassification',
+            help='name for this execution'
         )
         self.parser.add_argument(
             '--checkpoints_dir',
             type=str,
-            default='./checkpoints'
+            default='./checkpoints',
+            help='path to save options for this execution'
         )
         self.parser.add_argument(
             '--encoding',
