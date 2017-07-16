@@ -16,7 +16,7 @@ class SVMClassifier(object):
         '''
         self.X = X
         self.target = target
-        if self.X and self.target:
+        if self.X is not None and self.target is not None:
             self.train_X = self.X[0:int(len(self.X) * self.train_ratio)]
             self.train_targets = self.target[0:int(len(self.target) * self.train_ratio)]
             self.test_X = self.X[int(len(self.X) * self.train_ratio):]
