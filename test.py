@@ -75,6 +75,22 @@ def test(opt):
     for i in range(len(predicted_Y)):
         print(input_files[i].get_name() + ' is predicted to be class ' + str(predicted_Y[i]) + ' by the model')
 
+    # Calculate the metric
+    true_class = [int(input_file_name.get_name().split('-')[0][1:]) for input_file_name in input_files]
+    predict_class = [int(predict_c) for predict_c in predicted_Y]
+    from sklearn.metrics import precision_recall_fscore_support as score
+    precision, recall, fscore, support = score(np.array(true_class), np.array(predict_class))
+
+    import numpy as np
+    print('precision: {}'.format(precision))
+    print('avg of precision: {}'.format(np.average(precision)))
+    print('recall: {}'.format(recall))
+    print('avg of recall: {}'.format(np.average(recall)))
+    print('fscore: {}'.format(fscore))
+    print('avg of fscore: {}'.format(np.average(fscore)))
+    print('support: {}'.format(support))
+    print('total of support: {}'.format(np.sum(support)))
+
 
 if __name__ == '__main__':
     opt = TestOptions().parse_arguments()

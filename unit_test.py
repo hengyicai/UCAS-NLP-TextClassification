@@ -19,7 +19,7 @@ def lda_model_test():
 
 def svm_model_test():
     from datasource.input_corpus import InputCorpus
-    input_corpus = InputCorpus('./corpus_train', encoding='gb18030')
+    input_corpus = InputCorpus('./corpus_tiny', encoding='gb18030')
     from feature.ngram_tfidf import NgramTfidf
     unigram_tfidf = NgramTfidf(input_corpus)
     unigram_tfidf.set_stopwords('./resource/stop_words_zh.utf8.txt')
