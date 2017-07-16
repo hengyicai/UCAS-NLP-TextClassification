@@ -8,15 +8,8 @@ class TrainOptions(BaseOptions):
             '--corpus_root',
             type=str,
             required=False,
-            default='./corpus_test',
+            default='./corpus_tiny',
             help='path to documents(should have subfolders C1-Class1Name, C2-Class2Name,...,Cn-ClassnName)'
-        )
-        self.parser.add_argument(
-            '--encoding',
-            type=str,
-            required=False,
-            default='gb18030',
-            help='file encoding of documents'
         )
         self.parser.add_argument(
             '--tfidf_top_k',
@@ -29,5 +22,23 @@ class TrainOptions(BaseOptions):
             type=str,
             required=True,
             help='path to save the model'
+        )
+        self.parser.add_argument(
+            '--which_filter',
+            type=str,
+            default='mi',
+            help='mi or gbdt to filter the features'
+        )
+        self.parser.add_argument(
+            '--which_classifier',
+            type=str,
+            default='svm',
+            help='svm or gbdt classifier'
+        )
+        self.parser.add_argument(
+            '--mi_threshold',
+            type=float,
+            default=0.06,
+            help=''
         )
         self.isTrain = True

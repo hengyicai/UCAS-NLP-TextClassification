@@ -16,10 +16,5 @@ class TestOptions(BaseOptions):
             required=True,
             help='path to test dir(should have some documents under it)'
         )
-        self.parser.add_argument(
-            '--suffix_accepted',
-            type=str,
-            default='txt,TXT',
-            help='file with suffix_accepted will be read'
-        )
+
         self.isTrain = False

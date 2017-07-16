@@ -20,6 +20,19 @@ class BaseOptions():
             type=str,
             default='./checkpoints'
         )
+        self.parser.add_argument(
+            '--encoding',
+            type=str,
+            required=False,
+            default='gb18030',
+            help='file encoding of documents'
+        )
+        self.parser.add_argument(
+            '--suffix_accepted',
+            type=str,
+            default='txt,TXT',
+            help='file with suffix_accepted will be read'
+        )
 
         self.initialized = True
 

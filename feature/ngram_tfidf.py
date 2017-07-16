@@ -3,6 +3,7 @@
 __author__ = "HayesTsai"
 
 import jieba.posseg as pseg
+import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
@@ -18,6 +19,7 @@ class Tfidf(object):
         self.input_files = input_corpus.get_files()
         self.stop_words = self.STOP_WORDS.copy()
         self.vocab = list()
+        self.df = list()
         self.weight = [[]]
         self.tf = [[]]
         self.documents = []
@@ -54,7 +56,7 @@ class NgramTfidf(Tfidf):
         tfidf = transformer.fit_transform(self.tf)
 
         self.weight = tfidf.toarray()
-        return self.__top_k_tfidf(top_k)[0] if top_k > 0 else self.weight
+        return self.__top_k_tfidf(top_k) if top_k > 0 else (self.weight, self.vocab)
 
     def get_tf_mat(self, top_k=-1):
         if not self.documents:
@@ -63,7 +65,10 @@ class NgramTfidf(Tfidf):
         vectorizer = CountVectorizer()
         self.tf = vectorizer.fit_transform(self.documents).toarray()
         self.vocab = vectorizer.get_feature_names()
-        return self.__top_k_tf(top_k)[0] if top_k > 0 else self.tf
+        # Calc the df begin
+
+        # Calc the df end
+        return self.__top_k_tf(top_k) if top_k > 0 else (self.tf, self.vocab)
 
     def __get_docs(self):
         documents = list()
@@ -112,7 +117,6 @@ class NgramTfidf(Tfidf):
         # select top_k features
         feature_sum_vec = sum(mat)
 
-        import numpy as np
         sorted_index = list(np.argsort(feature_sum_vec))
         sorted_index.reverse()
 
@@ -127,6 +131,33 @@ class NgramTfidf(Tfidf):
             for index_of_feature in range(top_k):
                 new_mat[index_of_doc][index_of_feature] = mat[index_of_doc][sorted_index[index_of_feature]]
         return new_mat, new_vocab
+
+    def __freq(self, term, document):
+        """
+        Get freq of term in the given document.
+        :param term: str, term.
+        :param document: str, split by space.
+        :return:
+        """
+        return document.split().count(term)
+
+    def numDocsContainingFeatures(self, word_list):
+        df_vec = [0] * len(word_list)
+        for i in range(len(word_list)):
+            df_vec[i] = self.numDocsContaining(word_list[i], self.documents)
+        return df_vec
+
+    def numDocsContaining(self, word, doclist):
+        doccount = 0
+        for doc in doclist:
+            if self.__freq(word, doc) > 0:
+                doccount += 1
+        return doccount
+
+    def idf(self, word, doclist):
+        n_samples = len(doclist)
+        df = self.numDocsContaining(word, doclist)
+        return np.log(n_samples / 1 + df)
 
     def save_tfidf(self, save_to_path, top_k=20):
         if self.weight == [[]]:

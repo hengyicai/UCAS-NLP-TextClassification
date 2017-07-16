@@ -49,8 +49,11 @@ class SVMClassifier(object):
     def get_model(self):
         return self.model
 
-    def dump(self, path):
+    def dump(self, X, target, path):
         from sklearn.externals import joblib
+        f = open(path, 'w+')
+        f.close()
+        self.model.fit(X, target)
         joblib.dump(self.model, path)
 
 
@@ -77,8 +80,11 @@ class GBDTClassifier(object):
     def get_model(self):
         return self.model
 
-    def dump(self, path):
+    def dump(self, X, target, path):
         from sklearn.externals import joblib
+        f = open(path, 'w+')
+        f.close()
+        self.model.fit(X, target)
         joblib.dump(self.model, path)
 
 
@@ -94,5 +100,6 @@ class Scorer(object):
             from sklearn.model_selection import cross_val_score as cvs
         else:
             from sklearn.cross_validation import cross_val_score as cvs
+
         scores = cvs(self.model, self.X, self.targets)
         print("mean of scores is: " + str(scores.mean()))

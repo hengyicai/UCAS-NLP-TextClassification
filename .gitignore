@@ -8,4 +8,11 @@
 out
 gen
 .idea/
-corpus/
+corpus_big/
+corpus_mid/
+corpus_tiny/
+checkpoints/
+output/
+model_saved/
+script/
+unit_tests/

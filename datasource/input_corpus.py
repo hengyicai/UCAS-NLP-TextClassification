@@ -6,7 +6,7 @@ import os
 
 
 class InputCorpus(object):
-    def __init__(self, m_dir, encoding):
+    def __init__(self, m_dir, encoding, suffix_accepted='txt,TXT'):
         if os.path.isdir(m_dir):
             self.input_path = m_dir
             self.encoding = encoding
@@ -15,23 +15,28 @@ class InputCorpus(object):
         self.input_files = []
         self.filenames = []
         self.targets = []
+        self.suffix_accepted = tuple(suffix_accepted.split(','))
 
     def get_files(self):
         if not self.input_files:
             ret_files = []
             for root, _, files in os.walk(self.input_path, topdown=False):
                 for name in files:
+                    if name[0] == '.' or not name.endswith(self.suffix_accepted):
+                        pass
                     if '-' in name:
                         clazz = name.split('-')[0][1:]
-                        file_path = os.path.abspath(os.path.join(root, name))
-                        ret_files.append(
-                            InputFile(
-                                file_path,
-                                clazz,
-                                from_encoding=self.encoding,
-                                to_encoding='utf-8'
-                            )
+                    else:
+                        clazz = -1
+                    file_path = os.path.abspath(os.path.join(root, name))
+                    ret_files.append(
+                        InputFile(
+                            file_path,
+                            clazz,
+                            from_encoding=self.encoding,
+                            to_encoding='utf-8'
                         )
+                    )
             self.input_files = ret_files
         return self.input_files
 
