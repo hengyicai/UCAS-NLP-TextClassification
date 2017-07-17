@@ -124,9 +124,3 @@ $ python test.py \
 
 其中，测试语料位于路径 `./corpus_test/` 下, 测试文档的编码为 `gb18030`, 
 允许读取的文件后缀为`txt,csv,html`, 使用的模型为 `./model_saved/mi_0.06_svm.m`。
-
-对训练好的模型执行测试，示例输出如下:
-
-```bash
-$ TODO
-```

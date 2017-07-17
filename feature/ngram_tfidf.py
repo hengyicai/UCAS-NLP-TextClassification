@@ -47,11 +47,18 @@ class Tfidf(object):
 
 class NgramTfidf(Tfidf):
     def get_tfidf_mat(self, top_k=-1):
+        """
+        :param top_k: words whose tfidf within top-k will be selected.
+        :return: tuple(tfidf_mat, feature_names)
+        """
         if not self.documents:
+            # 根据 input_corpus 获取文档列表
             self.__get_docs()
         if self.tf == [[]]:
+            # 首先获取 term frequency 矩阵, shape:[n_samples, top_k]
             self.get_tf_mat()
 
+        # Transform a count matrix to a normalized tf or tf-idf representation
         transformer = TfidfTransformer()
         tfidf = transformer.fit_transform(self.tf)
 
